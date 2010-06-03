@@ -68,7 +68,7 @@
 #define DFU_STR_COUNT		DFU_STR_ALT(DFU_NUM_ALTERNATES)
 
 #define CONFIG_DFU_CFG_STR	"USB Device Firmware Upgrade"
-#define CONFIG_DFU_ALT0_STR	"RAM 0x32000000"
+#define CONFIG_DFU_ALT0_STR	"RAM 0x31000000"
 
 struct _dfu_desc {
 	struct usb_configuration_descriptor ucfg;

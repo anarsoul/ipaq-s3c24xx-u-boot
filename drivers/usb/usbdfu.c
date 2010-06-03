@@ -136,7 +136,7 @@ static struct part_info *get_partition_nand(int idx)
 	}
 }
 
-#define LOAD_ADDR ((unsigned char *)0x32000000)
+#define LOAD_ADDR ((unsigned char *)0x31000000)
 
 static int initialize_ds_nand(struct usb_device_instance *dev, struct dnload_state *ds)
 {
