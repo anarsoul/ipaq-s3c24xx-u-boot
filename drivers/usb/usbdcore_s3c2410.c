@@ -151,13 +151,21 @@ static void s3c2410_configure_device (struct usb_device_instance *device)
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
 	S3C24X0_CLOCK_POWER * const cpower = S3C24X0_GetBase_CLOCK_POWER();
 
+	/* Disable UDC DMA */
+	outl(0x00, S3C2410_UDC_EP1_DMA_CON);
+	outl(0x00, S3C2410_UDC_EP2_DMA_CON);
+	outl(0x00, S3C2410_UDC_EP3_DMA_CON);
+	outl(0x00, S3C2410_UDC_EP4_DMA_CON);
+
+	outl(0x00, S3C2410_UDC_PWR_REG);
+
 	/* disable EP0-4 SUBD interrupts ? */
 	outl(0x00, S3C2410_UDC_USB_INT_EN_REG);
 
 	/* UPLL already configured by board-level init code */
 
 	/* configure USB pads to device mode */
-	gpio->MISCCR &= ~(S3C2410_MISCCR_USBHOST|S3C2410_MISCCR_USBSUSPND1);
+	gpio->MISCCR &= ~(S3C2410_MISCCR_USBHOST | S3C2410_MISCCR_USBSUSPND1 | S3C2410_MISCCR_USBSUSPND0);
 
 	/* don't disable USB clock */
 	cpower->CLKSLOW &= ~S3C2410_CLKSLOW_UCLK_OFF;
