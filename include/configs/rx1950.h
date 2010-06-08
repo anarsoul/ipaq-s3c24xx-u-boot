@@ -35,7 +35,6 @@
 #define	CONFIG_SKIP_LOWLEVEL_INIT	1
 #else
 /* If we want to start u-boot directly from within NAND flash */
-#define CONFIG_S3C2410_NAND_BOOT	1
 #define CONFIG_S3C2410_NAND_SKIP_BAD	1
 #endif
 
@@ -75,7 +74,7 @@
  * select serial console configuration
  */
 #define CONFIG_SERIAL1          1	/* we use SERIAL 1 on SMDK2410 */
-#define CONFIG_SERIAL_MULTI
+//#define CONFIG_SERIAL_MULTI
 
 /* allow to overwrite serial and ethaddr */
 //#define CONFIG_ENV_OVERWRITE
@@ -114,7 +113,7 @@
 //#define CONFIG_CMD_MMC
 //#define CONFIG_CMD_FAT
 //#define CONFIG_CMD_EXT2
-#define CONFIG_CMD_TERMINAL
+//#define CONFIG_CMD_TERMINAL
 
 #define CONFIG_BOOTDELAY	10
 #define CONFIG_BOOTARGS    	"rootfstype=ext2 root=/dev/mmcblk0p2 console=ttySAC0,115200 console=tty0 loglevel=8"
@@ -171,17 +170,20 @@
 #define CONFIG_USB_DEVICE	1
 #define CONFIG_USB_TTY		1
 #define CFG_CONSOLE_IS_IN_ENV	1
-#define CONFIG_USBD_VENDORID		0x1457     /* Linux/NetChip */
+#define CONFIG_USBD_VENDORID		0x1d50     /* Linux/NetChip */
 #define CONFIG_USBD_PRODUCTID_GSERIAL	0x5120    /* gserial */
-#define CONFIG_USBD_PRODUCTID_CDCACM	0x511d    /* CDC ACM */
-#define CONFIG_USBD_MANUFACTURER	"HP"
+#define CONFIG_USBD_PRODUCTID_CDCACM	0x5119    /* CDC ACM */
+#define CONFIG_USBD_MANUFACTURER	"anarsoul"
 #define CONFIG_USBD_PRODUCT_NAME	"rx1950 Bootloader " U_BOOT_VERSION
-#define CONFIG_EXTRA_ENV_SETTINGS 					\
-	"usbtty=cdc_acm\0"						\
-	"stderr=usbtty\0stdout=usbtty\0stdin=usbtty\0"
 #define CONFIG_USBD_DFU			1
 #define CONFIG_USBD_DFU_XFER_SIZE	4096
 #define CONFIG_USBD_DFU_INTERFACE	2
+
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	"usbtty=cdc_acm\0"\
+	"stderr=usbtty\0stdout=usbtty\0stdin=usbtty\0"\
+	"mtdparts=Internal:16k(Boot0),256k(Boot1),3M(Kernel),-(Filesystem)\0"\
+	""
 
 /*-----------------------------------------------------------------------
  * Physical Memory Map
@@ -212,6 +214,9 @@
 #define CONFIG_SETUP_MEMORY_TAGS	1
 #define CONFIG_CMDLINE_TAG		1
 
+//#define CONFIG_SKIP_LOWLEVEL_INIT 1
+#define CONFIG_S3C24X0_SKIP_LOWLEVEL_INIT 1
+
 #define CONFIG_CMD_UNZIP
 
 #define CONFIG_S3C2410_NAND_BBT	1
@@ -221,5 +226,20 @@
 #define MTPARTS_DEFAULT		"Internal:16k(Boot0),256k(Boot1),3M(Kernel),-(Filesystem)"
 #define CFG_NAND_DYNPART_MTD_KERNEL_NAME "Internal"
 #define CONFIG_NAND_DYNPART
+
+#if 0
+#define CONFIG_VIDEO
+#define CONFIG_VIDEO_S3C2410
+#define CONFIG_CFB_CONSOLE
+#define CONFIG_VGA_AS_SINGLE_DEVICE
+
+#define VIDEO_FB_16BPP_PIXEL_SWAP
+
+#define VIDEO_KBD_INIT_FCT	0
+#define VIDEO_TSTC_FCT		serial_tstc
+#define VIDEO_GETC_FCT		serial_getc
+
+#define LCD_VIDEO_ADDR		0x31d00000
+#endif
 
 #endif	/* __CONFIG_H */
