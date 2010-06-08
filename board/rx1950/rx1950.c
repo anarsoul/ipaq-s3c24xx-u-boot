@@ -36,6 +36,7 @@
  */
 
 #include <common.h>
+#include <video_fb.h>
 #include <usbdcore.h>
 #include <s3c2440.h>
 
@@ -48,6 +49,14 @@ static inline void delay (unsigned long loops)
 	  "bne 1b":"=r" (loops):"0" (loops));
 }
 
+void rx1950_led_toggle()
+{
+	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
+
+	/* Toggle LED */
+	gpio->GPADAT ^= (1 << 6);
+}
+
 /*
  * Miscellaneous platform dependent initialisations
  */
@@ -55,6 +64,9 @@ static inline void delay (unsigned long loops)
 int board_init (void)
 {
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
+
+	/* Configure GPJ bank */
+	gpio->GPJCON = 0x01555555;
 
 	/* Disable write protect */
 	gpio->GPADAT |= (1 << 0);
@@ -82,7 +94,11 @@ void udc_ctrl(enum usbd_event event, int param)
 	switch (event)
 	{
 		case UDC_CTRL_PULLUP_ENABLE:
-			gpio->GPJDAT |= (1 << 5);
+			if (param)
+				gpio->GPJDAT |= (1 << 5);
+			else
+				gpio->GPJDAT &= (1 << 5);
+
 			break;
 #if 0
 		case UDC_CTRL_PULLUP_DISABLE:
@@ -95,6 +111,19 @@ void udc_ctrl(enum usbd_event event, int param)
 	}
 }
 #endif
+
+void board_video_init(GraphicDevice *pGD)
+{
+	S3C24X0_LCD * const lcd = S3C24X0_GetBase_LCD();
+
+	lcd->LCDCON1 = 0x00000c78;
+
+	lcd->LCDCON2 = 0x014fc041;
+	lcd->LCDCON3 = 0x0098ef09;
+	lcd->LCDCON4 = 0x00000009;
+	lcd->LCDCON5 = 0x00014f01;
+	lcd->LPCSEL  = 0x02;
+}
 
 int dram_init (void)
 {
