@@ -76,6 +76,7 @@
 #include "videomodes.h"
 
 const struct ctfb_vesa_modes vesa_modes[VESA_MODES_COUNT] = {
+	{0x211, RES_MODE_320x240, 16},
 	{0x301, RES_MODE_640x480, 8},
 	{0x310, RES_MODE_640x480, 15},
 	{0x311, RES_MODE_640x480, 16},
@@ -98,6 +99,7 @@ const struct ctfb_vesa_modes vesa_modes[VESA_MODES_COUNT] = {
 };
 const struct ctfb_res_modes res_mode_init[RES_MODES_COUNT] = {
 	/* x	 y pixclk   le	ri  up	lo   hs vs  s  vmode */
+	{320, 240, 260000, 10, 20, 2, 2, 10, 2, 0, FB_VMODE_NONINTERLACED},
 	{640, 480, 39721, 40, 24, 32, 11, 96, 2, 0, FB_VMODE_NONINTERLACED},
 	{800, 600, 27778, 64, 24, 22, 1, 72, 2, 0, FB_VMODE_NONINTERLACED},
 	{1024, 768, 15384, 168, 8, 29, 3, 144, 4, 0, FB_VMODE_NONINTERLACED},

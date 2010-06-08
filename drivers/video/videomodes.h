@@ -23,7 +23,7 @@
 
 
 #ifndef CFG_DEFAULT_VIDEO_MODE
-#define CFG_DEFAULT_VIDEO_MODE	0x301
+#define CFG_DEFAULT_VIDEO_MODE	0x211
 #endif
 
 /* Some mode definitions */
@@ -72,13 +72,14 @@ struct ctfb_vesa_modes {
 	int bits_per_pixel;	/* bpp */
 };
 
-#define RES_MODE_640x480	0
-#define RES_MODE_800x600	1
-#define RES_MODE_1024x768	2
-#define RES_MODE_960_720	3
-#define RES_MODE_1152x864	4
-#define RES_MODE_1280x1024	5
-#define RES_MODES_COUNT		6
+#define RES_MODE_320x240	0
+#define RES_MODE_640x480	1
+#define RES_MODE_800x600	2
+#define RES_MODE_1024x768	3
+#define RES_MODE_960_720	4
+#define RES_MODE_1152x864	5
+#define RES_MODE_1280x1024	6
+#define RES_MODES_COUNT		7
 
 #define VESA_MODES_COUNT 19
 
