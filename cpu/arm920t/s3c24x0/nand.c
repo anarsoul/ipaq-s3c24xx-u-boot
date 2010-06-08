@@ -185,17 +185,28 @@ static int s3c2410_dev_ready(struct mtd_info *mtd)
 void s3c2410_nand_enable_hwecc(struct mtd_info *mtd, int mode)
 {
 	DEBUGN("s3c2410_nand_enable_hwecc(%p, %d)\n", mtd ,mode);
+#if defined(CONFIG_S3C2440) | defined(CONFIG_S3C2442)
+	NFCONF |= S3C2440_NFCONF_INITECC;
+#elif defined(CONFIG_S3C2410)
 	NFCONF |= S3C2410_NFCONF_INITECC;
+#endif
 }
 
 static int s3c2410_nand_calculate_ecc(struct mtd_info *mtd, const u_char *dat,
 				      u_char *ecc_code)
 {
+#if defined(CONFIG_S3C2410)
 	ecc_code[0] = NFECC0;
 	ecc_code[1] = NFECC1;
 	ecc_code[2] = NFECC2;
 	DEBUGN("s3c2410_nand_calculate_hwecc(%p,): 0x%02x 0x%02x 0x%02x\n",
 		mtd , ecc_code[0], ecc_code[1], ecc_code[2]);
+#elif defined(CONFIG_S3C2440) | defined(CONFIG_S3C2442)
+	unsigned long ecc = NFMECC0;
+	ecc_code[0] = ecc;
+	ecc_code[1] = ecc >> 8;
+	ecc_code[2] = ecc >> 16;
+#endif
 
 	return 0;
 }
@@ -203,6 +214,8 @@ static int s3c2410_nand_calculate_ecc(struct mtd_info *mtd, const u_char *dat,
 static int s3c2410_nand_correct_data(struct mtd_info *mtd, u_char *dat,
 				     u_char *read_ecc, u_char *calc_ecc)
 {
+	unsigned int diff0, diff1, diff2;
+	unsigned int bit, byte;
 	if (read_ecc[0] == calc_ecc[0] &&
 	    read_ecc[1] == calc_ecc[1] &&
 	    read_ecc[2] == calc_ecc[2])

@@ -96,12 +96,22 @@ static struct nand_oobinfo nand_oob_8 = {
 	.oobfree = { {3, 2}, {6, 2} }
 };
 
+#if defined(CONFIG_S3C2440) || defined(CONFIG_S3C2442)
+#warning Using s3c244x ecc layout...
+static struct nand_oobinfo nand_oob_16 = {
+	.useecc = MTD_NANDECC_AUTOPLACE,
+	.eccbytes = 3,
+	.eccpos = {0, 1, 2},
+	.oobfree = { {8, 8} }
+};
+#else
 static struct nand_oobinfo nand_oob_16 = {
 	.useecc = MTD_NANDECC_AUTOPLACE,
 	.eccbytes = 6,
 	.eccpos = {0, 1, 2, 3, 6, 7},
 	.oobfree = { {8, 8} }
 };
+#endif
 
 static struct nand_oobinfo nand_oob_64 = {
 	.useecc = MTD_NANDECC_AUTOPLACE,
