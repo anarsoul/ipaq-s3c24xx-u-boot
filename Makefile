@@ -2454,6 +2454,9 @@ qt2410_config	:	unconfig
 rx1950_config	:	unconfig
 	@./mkconfig $(@:_config=) arm arm920t rx1950 NULL s3c24x0
 
+h1940_config	:	unconfig
+	@./mkconfig $(@:_config=) arm arm920t h1940 NULL s3c24x0
+
 hxd8_config	:	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm920t hxd8 NULL s3c24x0
 
