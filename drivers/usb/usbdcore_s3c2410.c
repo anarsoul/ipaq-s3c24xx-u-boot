@@ -457,11 +457,13 @@ void udc_irq(void)
 void s3c2410_udc_irq(void)
 {
 	struct usb_endpoint_instance *ep0 = udc_device->bus->endpoint_array;
-	u_int32_t save_idx = inl(S3C2410_UDC_INDEX_REG);
+	u_int32_t save_idx = inl(S3C2410_UDC_INDEX_REG), idx2;
 
 	/* read interrupt sources */
 	u_int32_t usb_status = inl(S3C2410_UDC_USB_INT_REG);
 	u_int32_t usbd_status = inl(S3C2410_UDC_EP_INT_REG);
+	u_int32_t pwr_reg = inl(S3C2410_UDC_PWR_REG);
+	u_int32_t ep0csr = inl(S3C2410_UDC_IN_CSR1_REG);
 
 	//debug("< IRQ usbs=0x%02x, usbds=0x%02x start >", usb_status, usbd_status);
 
@@ -503,6 +505,20 @@ void s3c2410_udc_irq(void)
 				/* FIXME: Handle EP X */
 				outl(tmp, S3C2410_UDC_EP_INT_REG);
 				s3c2410_udc_epn(i);
+			}
+		}
+
+		/* what else causes this interrupt? a receive! who is it? */
+		if (!usb_status && !usbd_status && !pwr_reg && !ep0csr) {
+			for (i = 1; i < 5; i++) {
+				idx2 = inl(S3C2410_UDC_INDEX_REG);
+				outl(i, S3C2410_UDC_INDEX_REG);
+
+				if (inl(S3C2410_UDC_OUT_CSR1_REG) & 0x1)
+					s3c2410_udc_epn(i);
+
+				/* restore index */
+				outl(idx2, S3C2410_UDC_INDEX_REG);
 			}
 		}
 	}
