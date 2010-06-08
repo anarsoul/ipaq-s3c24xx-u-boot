@@ -193,7 +193,11 @@ copyex:
 #elif defined(CONFIG_S3C2410) || defined(CONFIG_S3C2440) || defined(CONFIG_S3C2442)
 #  define pWTCON		0x53000000
 #  define INTMSK		0x4A000008	/* Interupt-Controller base addresses */
-#  define INTSUBMSK	0x4A00001C
+#  define INTMOD		0x4A000004  /* Interrupt mode register */
+#  define INTSUBMSK		0x4A00001C
+#  define SUBSRCPND		0x4A000018
+#  define SRCPND		0x4A000000
+#  define INTPND		0x4A000010
 #  define CLKDIVN	0x4C000014	/* clock divisor register */
 # endif
 
@@ -219,8 +223,8 @@ copyex:
 #  define MPLLCON_val ((142 << 12) + (7 << 4) + 1)
 #  define UPLLCON_val   (( 88 << 12) + (4 << 4) + 2)
 # elif (CONFIG_SYS_CLK_FREQ == 16934400)
-#  define MPLLCON_val   ((181 << 12) + (14<< 4) + 1)
-#  define UPLLCON_val   (( 26 << 12) + (4 << 4) + 1)
+#  define MPLLCON_val   ((0x3e << 12) + (0x2 << 4) + 0x1)
+#  define UPLLCON_val   ((0x3c << 12) + (0x4 << 4) + 0x2)
 # endif
 # define CLKDIVN_val  7 /* FCLK:HCLK:PCLK = 1:3:6 */
 # define CAMDIVN      0x4C000018
@@ -236,6 +240,12 @@ copyex:
 	str     r1, [r0]
 
 	/*
+	 * disable FIQ on all IRQs
+	 */
+	mov r1, #0
+	ldr r0, =INTMOD
+	str r1, [r0]
+	/*
 	 * mask all IRQs by setting all bits in the INTMR - default
 	 */
 	mov	r1, #0xffffffff
@@ -246,8 +256,16 @@ copyex:
 	ldr	r1, =INTSUBMSK_val
 	ldr	r0, =INTSUBMSK
 	str	r1, [r0]
+	mov r1, #0xffffffff
+	ldr r0, =SRCPND
+	str r1, [r0]
+	ldr r0, =INTPND
+	str r1, [r0]
+	ldr r0, =SUBSRCPND
+	str r1, [r0]
 # endif
 
+#ifndef CONFIG_S3C24X0_SKIP_LOWLEVEL_INIT
 #if defined(CONFIG_S3C2440) || defined(CONFIG_S3C2442)
 	/* Make sure we get FCLK:HCLK:PCLK = 1:3:6 */
 	ldr	r0, =CAMDIVN
@@ -327,6 +345,8 @@ copyex:
 	str	r1, [r0]
 #endif
 
+#endif
+
 #if 1
 	/* enable uart */
 	ldr	r0, =0x4c00000c		/* clkcon */
@@ -355,8 +375,8 @@ copyex:
 #endif	/* CONFIG_S3C2400 || CONFIG_S3C2410 || CONFIG_S3C2440 || CONFIG_S3C2442
 	   CONFIG_S3C2443 */
 
+//#ifndef CONFIG_LL_INIT_NAND_ONLY
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
-#ifndef CONFIG_LL_INIT_NAND_ONLY
 	bl	cpu_init_crit
 #endif
 
@@ -663,10 +683,9 @@ may_resume:
 					 * source for the OS to look at
 					 */
 	ldrne	pc, [r1, #4]
-#endif /* CONFIG_S3C2410 || CONFIG_S3C244 || CONFIG_S3C2442 */
-#endif /* CONFIG_SKIP_LOWLEVEL_INIT */
 
 	mov	pc, r10
+#endif /* CONFIG_S3C2410 || CONFIG_S3C244 || CONFIG_S3C2442 */
 
 /*
  *************************************************************************
