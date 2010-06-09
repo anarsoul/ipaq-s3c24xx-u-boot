@@ -42,6 +42,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define H1940_LATCH 0x10000000
+
 static inline void delay (unsigned long loops)
 {
 	__asm__ volatile ("1:\n"
@@ -56,7 +58,10 @@ static inline void delay (unsigned long loops)
 int board_init (void)
 {
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
-	u_int32_t * latch = (u_int32_t *)0xF8000000;
+	u_int32_t * latch = (u_int32_t *)H1940_LATCH;
+
+	/* Enable latch chip select */
+	gpio->GPACON |= (1 << 13);
 
 	/* Disable write protect */
 	gpio->GPADAT |= (1 << 0);
@@ -81,7 +86,7 @@ int board_init (void)
 void udc_ctrl(enum usbd_event event, int param)
 {
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
-	u_int32_t * latch = (u_int32_t *)0xF8000000;
+	u_int32_t * latch = (u_int32_t *)H1940_LATCH;
 
 	switch (event)
 	{
