@@ -30,21 +30,21 @@
 #if !defined(CFG_NAND_LEGACY)
 
 #include <nand.h>
-#include <s3c2410.h>
 
 #define __REGb(x)	(*(volatile unsigned char *)(x))
 #define __REGi(x)	(*(volatile unsigned int *)(x))
 
-#define	NF_BASE		0x4e000000
-
-#define	NFCONF		__REGi(NF_BASE + 0x0)
-
 #if defined(CONFIG_S3C2410)
+#include <s3c2410.h>
+
+#define NF_BASE S3C2410_NAND_BASE
 
 #define oNFCMD		0x4
 #define	oNFADDR		0x8
 #define oNFDATA		0xc
 #define oNFSTAT		0x10
+#define NFCONF		__REGb(NF_BASE + oNFCONF)
+#define NFSTAT		__REGb(NF_BASE + oNFSTAT)
 #define NFECC0		__REGb(NF_BASE + 0x14)
 #define NFECC1		__REGb(NF_BASE + 0x15)
 #define NFECC2		__REGb(NF_BASE + 0x16)
@@ -59,17 +59,22 @@
 #define S3C2410_NFCONF_TWRPH1(x)   ((x)<<0)
 
 #elif defined(CONFIG_S3C2440) || defined(CONFIG_S3C2442)
+#include <s3c2440.h>
+
+#define NF_BASE S3C2440_NAND_BASE
 
 #define oNFCMD		0x8
 #define oNFADDR		0xc
 #define oNFDATA		0x10
 #define oNFSTAT		0x20
 
-#define	NFCONT		__REGi(NF_BASE + 0x04)
-#define	NFMECC0		__REGi(NF_BASE + 0x2C)
+#define NFECC0		__REGb(NF_BASE + 0x14)
+#define NFECC1		__REGb(NF_BASE + 0x15)
+#define NFECC2		__REGb(NF_BASE + 0x16)
+
 #define NFCONF_nFCE	(1<<1)
-#define S3C2440_NFCONF_INITECC		(1<<4)
-#define S3C2440_NFCONF_MAINECCLOCK	(1<<5)
+#define S3C2440_NFCONT_INITECC		(1<<4)
+#define S3C2440_NFCONT_MAINECCLOCK	(1<<5)
 #define nand_select()		(NFCONT &= ~(1 << 1))
 #define nand_deselect()		(NFCONT |= (1 << 1))
 #define nand_clear_RnB()	(NFSTAT |= (1 << 2))
@@ -77,11 +82,6 @@
 #define nand_wait()		{ while(!(NFSTAT & 0x4)); } /* RnB_TransDectect */
 
 #endif
-
-#define	NFCMD		__REGb(NF_BASE + oNFCMD)
-#define	NFADDR		__REGb(NF_BASE + oNFADDR)
-#define	NFDATA		__REGb(NF_BASE + oNFDATA)
-#define	NFSTAT		__REGb(NF_BASE + oNFSTAT)
 
 #if defined(CONFIG_HXD8)
 static int hxd8_nand_dev_ready(struct mtd_info *mtd)
@@ -148,7 +148,12 @@ static void s3c2410_hwcontrol(struct mtd_info *mtd, int cmd)
 #if defined(CONFIG_S3C2410)
 		NFCONF &= ~NFCONF_nFCE;
 #elif defined(CONFIG_S3C2440) || defined(CONFIG_S3C2442)
+#ifdef CONFIG_S3C2410_NAND_HWECC
+		NFCONT = (NFCONT & ~((1 << 5) | NFCONF_nFCE)) | S3C2440_NFCONT_INITECC;
+
+#else
 		NFCONT &= ~NFCONF_nFCE;
+#endif
 #endif
 		DEBUGN("NFCONF=0x%08x\n", NFCONF);
 		break;
@@ -186,7 +191,7 @@ void s3c2410_nand_enable_hwecc(struct mtd_info *mtd, int mode)
 {
 	DEBUGN("s3c2410_nand_enable_hwecc(%p, %d)\n", mtd ,mode);
 #if defined(CONFIG_S3C2440) | defined(CONFIG_S3C2442)
-	NFCONF |= S3C2440_NFCONF_INITECC;
+	NFCONT |= S3C2440_NFCONT_INITECC;
 #elif defined(CONFIG_S3C2410)
 	NFCONF |= S3C2410_NFCONF_INITECC;
 #endif
@@ -214,8 +219,6 @@ static int s3c2410_nand_calculate_ecc(struct mtd_info *mtd, const u_char *dat,
 static int s3c2410_nand_correct_data(struct mtd_info *mtd, u_char *dat,
 				     u_char *read_ecc, u_char *calc_ecc)
 {
-	unsigned int diff0, diff1, diff2;
-	unsigned int bit, byte;
 	if (read_ecc[0] == calc_ecc[0] &&
 	    read_ecc[1] == calc_ecc[1] &&
 	    read_ecc[2] == calc_ecc[2])
