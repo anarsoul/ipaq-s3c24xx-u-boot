@@ -30,29 +30,16 @@ SOBJS	:= lowlevel_init.o
 
 .PHONY:	all
 
-all:	$(LIB) lowevel_foo.bin
+all:	$(LIB)
 
 $(LIB):	$(OBJS) $(SOBJS)
 	$(AR) crv $@ $(OBJS) $(SOBJS)
 
-lowlevel_foo.o:	../neo1973/common/lowlevel_foo.S
-	$(CC) -c -DTEXT_BASE=0x33F80000 -march=armv4 \
-	  -o lowlevel_foo.o ../neo1973/common/lowlevel_foo.S
-
-lowlevel_foo:	lowlevel_foo.o lowlevel_init.o \
-		../neo1973/common/lowlevel_foo.lds
-	$(LD) -T ../neo1973/common/lowlevel_foo.lds -Ttext 0x33F80000 -Bstatic \
-          lowlevel_init.o lowlevel_foo.o -o lowlevel_foo
-
-lowevel_foo.bin:	lowlevel_foo
-	$(CROSS_COMPILE)objcopy --gap-fill=0xff -O binary \
-	  lowlevel_foo lowlevel_foo.bin
-
 clean:
-	rm -f $(SOBJS) $(OBJS) lowlevel_foo lowlevel_foo.o
+	rm -f $(SOBJS) $(OBJS)
 
 distclean:	clean
-	rm -f $(LIB) core *.bak .depend lowlevel_foo.bin
+	rm -f $(LIB) core *.bak .depend
 
 #########################################################################
 
