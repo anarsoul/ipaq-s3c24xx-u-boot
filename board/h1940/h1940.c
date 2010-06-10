@@ -58,7 +58,7 @@ static inline void delay (unsigned long loops)
 int board_init (void)
 {
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
-	u_int32_t * latch = (u_int32_t *)H1940_LATCH;
+	u_int32_t latch = inl(H1940_LATCH);
 
 	/* Enable latch chip select */
 	gpio->GPACON |= (1 << 13);
@@ -68,7 +68,8 @@ int board_init (void)
 
 	/* Enable green LED to indicate we're booting */
 	gpio->GPADAT |= (1 << 7);
-	(*latch) |= (1 << 30);
+	latch |= (1 << 30);
+	outl(latch, H1940_LATCH);
 
 	/* arch number of SMDK2410-Board */
 	gd->bd->bi_arch_number = MACH_TYPE_H1940;
@@ -86,15 +87,16 @@ int board_init (void)
 void udc_ctrl(enum usbd_event event, int param)
 {
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
-	u_int32_t * latch = (u_int32_t *)H1940_LATCH;
+	u_int32_t latch = inl(H1940_LATCH);
 
 	switch (event)
 	{
 		case UDC_CTRL_PULLUP_ENABLE:
 			if (param)
-				(*latch) |= (1 << 23);
+				latch |= (1 << 23);
 			else
-				(*latch) &= ~(1 << 23);
+				latch &= ~(1 << 23);
+			outl(latch, H1940_LATCH);
 
 			break;
 #if 0
