@@ -65,8 +65,12 @@ int board_init (void)
 {
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
 
-	/* Configure GPJ bank */
+	/* Configure some GPIO banks */
+	gpio->GPECON = 0xa56aa955;
 	gpio->GPJCON = 0x01555555;
+
+	/* Enable mmc power */
+	gpio->GPJDAT |= (1 << 1);
 
 	/* Disable write protect */
 	gpio->GPADAT |= (1 << 0);
@@ -80,7 +84,7 @@ int board_init (void)
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = 0x30100100;
 
-	/* icache is already enabled, don't reenable it :) */
+	icache_enable();
 	dcache_enable();
 
 	return 0;
@@ -97,14 +101,8 @@ void udc_ctrl(enum usbd_event event, int param)
 			if (param)
 				gpio->GPJDAT |= (1 << 5);
 			else
-				gpio->GPJDAT &= (1 << 5);
-
+				gpio->GPJDAT &= ~(1 << 5);
 			break;
-#if 0
-		case UDC_CTRL_PULLUP_DISABLE:
-			gpio->GPJDAT &= ~(1 << 5);
-			break;
-#endif
 		default:
 			break;
 

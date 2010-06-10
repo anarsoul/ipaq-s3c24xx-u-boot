@@ -51,7 +51,6 @@
 /* input clock of PLL */
 #define CONFIG_SYS_CLK_FREQ	16934400 /* the rx1950 has 16.9344MHz input clock */
 
-
 #define USE_920T_MMU		1
 #define CONFIG_USE_IRQ		1
 
@@ -110,9 +109,9 @@
 #define CONFIG_CMD_SAVES
 #define CONFIG_CMD_NAND
 #define CONFIG_CMD_PORTIO
-//#define CONFIG_CMD_MMC
-//#define CONFIG_CMD_FAT
-//#define CONFIG_CMD_EXT2
+#define CONFIG_CMD_MMC
+#define CONFIG_CMD_FAT
+#define CONFIG_CMD_EXT2
 //#define CONFIG_CMD_TERMINAL
 
 #define CONFIG_BOOTDELAY	10
@@ -199,6 +198,14 @@
 #define NAND_MAX_CHIPS		1
 #define CFG_NAND_BASE		0x4e000000
 #define CFG_MAX_NAND_DEVICE	1
+
+#define CONFIG_MMC		1
+#define CONFIG_MMC_S3C	1	/* Enabling the MMC driver */
+#define CFG_MMC_BASE		0xff000000
+
+#define CONFIG_EXT2		1
+#define CONFIG_FAT		1
+#define CONFIG_SUPPORT_VFAT
 
 #if 1
 /* JFFS2 driver */
