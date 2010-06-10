@@ -29,15 +29,6 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#if 0
-/* If we want to start u-boot from usb bootloader in NOR flash */
-#define CONFIG_SKIP_RELOCATE_UBOOT	1
-#define	CONFIG_SKIP_LOWLEVEL_INIT	1
-#else
-/* If we want to start u-boot directly from within NAND flash */
-#define CONFIG_S3C2410_NAND_SKIP_BAD	1
-#endif
-
 #define CFG_UBOOT_SIZE            0x40000
 
 /*
@@ -61,23 +52,9 @@
 #define CFG_GBL_DATA_SIZE	128	/* size in bytes reserved for initial data */
 
 /*
- * Hardware drivers
- */
-#if 0
-#define CONFIG_DRIVER_CS8900	1	/* we have a CS8900 on-board */
-#define CS8900_BASE		0x19000300
-#define CS8900_BUS16		1 /* the Linux driver does accesses as shorts */
-#endif
-
-/*
  * select serial console configuration
  */
 #define CONFIG_SERIAL1          1	/* we use SERIAL 1 on SMDK2410 */
-//#define CONFIG_SERIAL_MULTI
-
-/* allow to overwrite serial and ethaddr */
-//#define CONFIG_ENV_OVERWRITE
-
 #define CONFIG_BAUDRATE		115200
 
 /***********************************************************
@@ -91,37 +68,36 @@
 #define CONFIG_CMD_ENV
 #define CONFIG_CMD_BOOTD
 #define CONFIG_CMD_CONSOLE
-//#define CONFIG_CMD_BPM
 #define CONFIG_CMD_ASKENV
 #define CONFIG_CMD_RUN
 #define CONFIG_CMD_ECHO
-//#define CONFIG_CMD_I2C
 #define CONFIG_CMD_REGINFO
 #define CONFIG_CMD_IMMAP
-//#define CONFIG_CMD_DATE
 #define CONFIG_CMD_AUTOSCRIPT
 #define CONFIG_CMD_BSP
 #define CONFIG_CMD_ELF
 #define CONFIG_CMD_MISC
 #define CONFIG_CMD_JFFS2
 #define CONFIG_CMD_DIAG
-//#define CONFIG_CMD_HWFLOW
 #define CONFIG_CMD_SAVES
 #define CONFIG_CMD_NAND
 #define CONFIG_CMD_PORTIO
 #define CONFIG_CMD_MMC
 #define CONFIG_CMD_FAT
 #define CONFIG_CMD_EXT2
-//#define CONFIG_CMD_TERMINAL
 
 #define CONFIG_BOOTDELAY	10
-#define CONFIG_BOOTARGS    	"rootfstype=ext2 root=/dev/mmcblk0p2 console=ttySAC0,115200 console=tty0 loglevel=8"
+#define CONFIG_BOOTARGS    	"root=/dev/mmcblk0p2 rootdelay=5 psplash=false"
 #define CONFIG_ETHADDR		01:ab:cd:ef:fe:dc
 #define CONFIG_NETMASK          255.255.255.0
 #define CONFIG_IPADDR		10.0.0.110
 #define CONFIG_SERVERIP		10.0.0.1
-/*#define CONFIG_BOOTFILE	"elinos-lart" */
+
+#if 1
+#define CONFIG_BOOTCOMMAND	""
+#else
 #define CONFIG_BOOTCOMMAND	"nand load 0x30100000 0x44000 0x300000; bootm 0x30100000"
+#endif
 
 #define CONFIG_DOS_PARTITION	1
 
