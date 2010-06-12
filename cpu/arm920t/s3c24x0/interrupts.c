@@ -65,6 +65,7 @@ int interrupt_init (void)
 	/* use PWM Timer 4 because it has no output */
 	/* prescaler for Timer 4 is 16 */
 	timers->TCFG0 = 0x0f00;
+	timers->TCFG1 &= ~(7 << 16);
 #if defined(CONFIG_S3C2400) || defined(CONFIG_S3C2410)
 	if (timer_load_val == 0)
 	{
