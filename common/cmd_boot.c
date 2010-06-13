@@ -87,3 +87,40 @@ U_BOOT_CMD(
 	"reset   - Perform RESET of the CPU\n",
 	NULL
 );
+
+int do_bootstrap(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
+{
+	ulong	addr, rc;
+	int     rcode = 0;
+
+	if (argc < 2) {
+		printf ("Usage:\n%s\n", cmdtp->usage);
+		return 1;
+	}
+
+	addr = simple_strtoul(argv[1], NULL, 16);
+
+	printf ("## Starting application at 0x%08lX ...\n", addr);
+
+#if (defined(CONFIG_S3C2410) || defined(CONFIG_S3C2440) || \
+     defined(CONFIG_S3C2442) || defined(CONFIG_S3C2443)) && defined(CONFIG_USB_DEVICE)
+	udc_disable();
+#endif
+
+	disable_interrupts();
+	icache_disable();
+	dcache_disable();
+
+	((void (*)(void))addr) ();
+
+	/* Should never return */
+	enable_interrupts();
+
+	return 0;
+}
+
+U_BOOT_CMD(
+	bootstrap, CFG_MAXARGS, 1,	do_bootstrap,
+	"bootstrap      - start another bootloader at address 'addr'\n",
+	"addr\n    - start bootloader at address 'addr'\n"
+);
