@@ -92,37 +92,31 @@
 #define CONFIG_CMD_ENV
 #define CONFIG_CMD_BOOTD
 #define CONFIG_CMD_CONSOLE
-//#define CONFIG_CMD_BPM
 #define CONFIG_CMD_ASKENV
 #define CONFIG_CMD_RUN
 #define CONFIG_CMD_ECHO
-//#define CONFIG_CMD_I2C
 #define CONFIG_CMD_REGINFO
 #define CONFIG_CMD_IMMAP
-//#define CONFIG_CMD_DATE
 #define CONFIG_CMD_AUTOSCRIPT
 #define CONFIG_CMD_BSP
 #define CONFIG_CMD_ELF
 #define CONFIG_CMD_MISC
 #define CONFIG_CMD_JFFS2
 #define CONFIG_CMD_DIAG
-//#define CONFIG_CMD_HWFLOW
 #define CONFIG_CMD_SAVES
 #define CONFIG_CMD_NAND
 #define CONFIG_CMD_PORTIO
-//#define CONFIG_CMD_MMC
-//#define CONFIG_CMD_FAT
-//#define CONFIG_CMD_EXT2
-//#define CONFIG_CMD_TERMINAL
+#define CONFIG_CMD_MMC
+#define CONFIG_CMD_FAT
+#define CONFIG_CMD_EXT2
 
 #define CONFIG_BOOTDELAY	10
-#define CONFIG_BOOTARGS    	"rootfstype=ext2 root=/dev/mmcblk0p2 console=ttySAC0,115200 console=tty0 loglevel=8"
+#define CONFIG_BOOTARGS    	"rootfstype=ext2 root=/dev/mmcblk0p2 rootdelay=5"
 #define CONFIG_ETHADDR		01:ab:cd:ef:fe:dc
 #define CONFIG_NETMASK          255.255.255.0
 #define CONFIG_IPADDR		10.0.0.110
 #define CONFIG_SERVERIP		10.0.0.1
-/*#define CONFIG_BOOTFILE	"elinos-lart" */
-#define CONFIG_BOOTCOMMAND	"nand load 0x30100000 0x50000 0x300000; bootm 0x30100000"
+#define CONFIG_BOOTCOMMAND	""
 
 #define CONFIG_DOS_PARTITION	1
 
@@ -199,6 +193,14 @@
 #define NAND_MAX_CHIPS		1
 #define CFG_NAND_BASE		0x4e000000
 #define CFG_MAX_NAND_DEVICE	1
+
+#define CONFIG_MMC		1
+#define CONFIG_MMC_S3C	1	/* Enabling the MMC driver */
+#define CFG_MMC_BASE		0xff000000
+
+#define CONFIG_EXT2		1
+#define CONFIG_FAT		1
+#define CONFIG_SUPPORT_VFAT
 
 #if 1
 /* JFFS2 driver */

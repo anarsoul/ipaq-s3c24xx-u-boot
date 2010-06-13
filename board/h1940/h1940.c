@@ -44,6 +44,42 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define H1940_LATCH 0x10000000
 
+/* SD layer latch */
+
+#define H1940_LATCH_SDQ1		(1<<16)
+#define H1940_LATCH_LCD_P1		(1<<17)
+#define H1940_LATCH_LCD_P2		(1<<18)
+#define H1940_LATCH_LCD_P3		(1<<19)
+#define H1940_LATCH_MAX1698_nSHUTDOWN	(1<<20)		/* LCD backlight */
+#define H1940_LATCH_LED_RED		(1<<21)
+#define H1940_LATCH_SDQ7		(1<<22)
+#define H1940_LATCH_USB_DP		(1<<23)
+
+/* CPU layer latch */
+
+#define H1940_LATCH_UDA_POWER		(1<<24)
+#define H1940_LATCH_AUDIO_POWER		(1<<25)
+#define H1940_LATCH_SM803_ENABLE	(1<<26)
+#define H1940_LATCH_LCD_P4			(1<<27)
+#define H1940_LATCH_SD_POWER		(1<<28)
+#define H1940_LATCH_BLUETOOTH_POWER	(1<<29)		/* active high */
+#define H1940_LATCH_LED_GREEN		(1<<30)
+#define H1940_LATCH_LED_FLASH		(1<<31)
+
+/* default settings */
+
+#define H1940_LATCH_DEFAULT		\
+	H1940_LATCH_LCD_P4		| \
+	H1940_LATCH_SM803_ENABLE	| \
+	H1940_LATCH_SDQ1		| \
+	H1940_LATCH_LCD_P1		| \
+	H1940_LATCH_LCD_P2		| \
+	H1940_LATCH_LCD_P3		| \
+	H1940_LATCH_MAX1698_nSHUTDOWN   | \
+	H1940_LATCH_SD_POWER
+
+static u_int32_t h1940_latch = H1940_LATCH_DEFAULT;
+
 static inline void delay (unsigned long loops)
 {
 	__asm__ volatile ("1:\n"
@@ -58,18 +94,20 @@ static inline void delay (unsigned long loops)
 int board_init (void)
 {
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
-	u_int32_t latch = inl(H1940_LATCH);
 
 	/* Enable latch chip select */
 	gpio->GPACON |= (1 << 13);
+
+	/* Configure mmc pins to function mode */
+	gpio->GPECON = 0xa52aa955;
 
 	/* Disable write protect */
 	gpio->GPADAT |= (1 << 0);
 
 	/* Enable green LED to indicate we're booting */
 	gpio->GPADAT |= (1 << 7);
-	latch |= (1 << 30);
-	outl(latch, H1940_LATCH);
+	h1940_latch |= H1940_LATCH_LED_GREEN;
+	outl(h1940_latch, H1940_LATCH);
 
 	/* arch number of SMDK2410-Board */
 	gd->bd->bi_arch_number = MACH_TYPE_H1940;
@@ -79,6 +117,7 @@ int board_init (void)
 
 	/* icache is already enabled, don't reenable it */
 	dcache_enable();
+	icache_enable();
 
 	return 0;
 }
@@ -87,23 +126,17 @@ int board_init (void)
 void udc_ctrl(enum usbd_event event, int param)
 {
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
-	u_int32_t latch = inl(H1940_LATCH);
 
 	switch (event)
 	{
 		case UDC_CTRL_PULLUP_ENABLE:
 			if (param)
-				latch |= (1 << 23);
+				h1940_latch |= (1 << 23);
 			else
-				latch &= ~(1 << 23);
-			outl(latch, H1940_LATCH);
+				h1940_latch &= ~(1 << 23);
+			outl(h1940_latch, H1940_LATCH);
 
 			break;
-#if 0
-		case UDC_CTRL_PULLUP_DISABLE:
-			gpio->GPJDAT &= ~(1 << 5);
-			break;
-#endif
 		default:
 			break;
 
