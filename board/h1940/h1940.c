@@ -233,8 +233,8 @@ int dram_init (void)
 }
 
 unsigned int dynpart_size[] = {
-    0x4000, 0x40000, 0x8000, 0x300000, 0x1cb4000, 0 };
+    0x4000, 0x3c000, 0x4000, 0x8000, 0x300000, 0x1cb4000, 0 };
 
 char *dynpart_names[] = {
-    "Boot0", "Boot1", "Opts", "Kernel", "Filesystem", NULL };
+    "Boot0", "Boot1", "Env", "Opts", "Kernel", "Filesystem", NULL };
 
