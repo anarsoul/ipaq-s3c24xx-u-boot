@@ -35,6 +35,7 @@
  * MA 02111-1307 USA
  */
 
+#include <bootmenu_simple.h>
 #include <common.h>
 #include <video_fb.h>
 #include <usbdcore.h>
@@ -49,13 +50,56 @@ static inline void delay (unsigned long loops)
 	  "bne 1b":"=r" (loops):"0" (loops));
 }
 
-void rx1950_led_toggle()
+/*
+ * 1 for green
+ * 2 for red
+ * 4 for blue
+ */
+void rx1950_led_set(int value)
 {
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
 
-	/* Toggle LED */
-	gpio->GPADAT ^= (1 << 6);
+	value += 1;
+
+	if (value & 1)
+		gpio->GPADAT |= (1 << 6);
+	else
+		gpio->GPADAT &= ~(1 << 6);
+
+	if (value & 2)
+		gpio->GPADAT |= (1 << 7);
+	else
+		gpio->GPADAT &= ~(1 << 7);
+
+	if (value & 4)
+		gpio->GPADAT |= (1 << 11);
+	else
+		gpio->GPADAT &= ~(1 << 11);
 }
+
+int rx1950_up_pressed(void)
+{
+	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
+
+	if (gpio->GPGDAT & (1 << 4))
+		return 0;
+	return 1;
+}
+
+int rx1950_down_pressed(void)
+{
+	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
+
+	if (gpio->GPGDAT & (1 << 6))
+		return 0;
+	return 1;
+}
+
+static struct bootmenu_simple_setup rx1950_bm_setup = {
+	.next_key = rx1950_down_pressed,
+	.prev_key = rx1950_up_pressed,
+	.print_index = rx1950_led_set,
+};
 
 /*
  * Miscellaneous platform dependent initialisations
@@ -75,9 +119,6 @@ int board_init (void)
 	/* Disable write protect */
 	gpio->GPADAT |= (1 << 0);
 
-	/* Enable green LED to indicate we're booting */
-	gpio->GPADAT |= (1 << 6);
-
 	/* arch number of SMDK2410-Board */
 	gd->bd->bi_arch_number = MACH_TYPE_RX1950;
 
@@ -86,6 +127,15 @@ int board_init (void)
 
 	icache_enable();
 	dcache_enable();
+
+	bootmenu_simple_init(&rx1950_bm_setup);
+
+	return 0;
+}
+
+int board_late_init(void)
+{
+	bootmenu_simple_init(&rx1950_bm_setup);
 
 	return 0;
 }
