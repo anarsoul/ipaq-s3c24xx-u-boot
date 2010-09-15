@@ -116,7 +116,7 @@
 #define CONFIG_NETMASK          255.255.255.0
 #define CONFIG_IPADDR		10.0.0.110
 #define CONFIG_SERVERIP		10.0.0.1
-#define CONFIG_BOOTCOMMAND	""
+#define CONFIG_BOOTCOMMAND	"run bootcmd${bootindex}"
 
 #define CONFIG_DOS_PARTITION	1
 
@@ -150,6 +150,8 @@
 /* valid baudrates */
 #define CFG_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 
+#define CFG_BOOTMENU_SIMPLE	1
+
 /*-----------------------------------------------------------------------
  * Stack sizes
  *
@@ -177,6 +179,9 @@
 	"usbtty=cdc_acm\0"\
 	"stderr=usbtty\0stdout=usbtty\0stdin=usbtty\0"\
 	"mtdparts=Internal:16k(Boot0),256k(Boot1),32k(Opts),3M(Kernel),-(Filesystem)\0"\
+	"bootcmd0=mmcinit; fatload mmc 1:1 0x30080000 h1940.bl; bootstrap 0x30080000\0"\
+	"bootcmd1=mmcinit; fatload mmc 1:1 0x31000000 uImage; bootm 0x31000000\0"\
+	"bootindex=0\0"\
 	""
 
 /*-----------------------------------------------------------------------
@@ -228,6 +233,8 @@
 #define MTPARTS_DEFAULT		"Internal:16k(Boot0),256k(Boot1),32k(Opts),3M(Kernel),-(Filesystem)"
 #define CFG_NAND_DYNPART_MTD_KERNEL_NAME "Internal"
 #define CONFIG_NAND_DYNPART
+
+#define BOARD_LATE_INIT			1
 
 #if 0
 #define CONFIG_VIDEO

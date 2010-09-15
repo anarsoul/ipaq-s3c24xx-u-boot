@@ -35,6 +35,7 @@
  * MA 02111-1307 USA
  */
 
+#include <bootmenu_simple.h>
 #include <common.h>
 #include <video_fb.h>
 #include <usbdcore.h>
@@ -88,6 +89,70 @@ static inline void delay (unsigned long loops)
 }
 
 /*
+ * 1 for green
+ * 2 for red
+ * 4 for blue
+ */
+void h1940_led_set(int value)
+{
+	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
+
+	value += 1;
+
+	if (value & 1) {
+		h1940_latch |= H1940_LATCH_LED_GREEN;
+		outl(h1940_latch, H1940_LATCH);
+		gpio->GPADAT |= (1 << 7);
+	} else {
+		h1940_latch &= ~H1940_LATCH_LED_GREEN;
+		outl(h1940_latch, H1940_LATCH);
+		gpio->GPADAT &= ~(1 << 7);
+	}
+
+	if (value & 2) {
+		h1940_latch |= H1940_LATCH_LED_RED;
+		outl(h1940_latch, H1940_LATCH);
+		gpio->GPADAT |= (1 << 1);
+	} else {
+		h1940_latch &= ~H1940_LATCH_LED_RED;
+		outl(h1940_latch, H1940_LATCH);
+		gpio->GPADAT &= ~(1 << 1);
+	}
+
+	if (value & 4) {
+		h1940_latch |= H1940_LATCH_LED_FLASH;
+		gpio->GPADAT |= (1 << 3);
+	} else {
+		h1940_latch &= ~H1940_LATCH_LED_FLASH;
+		gpio->GPADAT &= ~(1 << 3);
+	}
+}
+
+int h1940_up_pressed(void)
+{
+	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
+
+	if (gpio->GPGDAT & (1 << 9))
+		return 0;
+	return 1;
+}
+
+int h1940_down_pressed(void)
+{
+	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
+
+	if (gpio->GPGDAT & (1 << 10))
+		return 0;
+	return 1;
+}
+
+static struct bootmenu_simple_setup h1940_bm_setup = {
+	.next_key = h1940_down_pressed,
+	.prev_key = h1940_up_pressed,
+	.print_index = h1940_led_set,
+};
+
+/*
  * Miscellaneous platform dependent initialisations
  */
 
@@ -104,11 +169,6 @@ int board_init (void)
 	/* Disable write protect */
 	gpio->GPADAT |= (1 << 0);
 
-	/* Enable green LED to indicate we're booting */
-	gpio->GPADAT |= (1 << 7);
-	h1940_latch |= H1940_LATCH_LED_GREEN;
-	outl(h1940_latch, H1940_LATCH);
-
 	/* arch number of SMDK2410-Board */
 	gd->bd->bi_arch_number = MACH_TYPE_H1940;
 
@@ -118,6 +178,13 @@ int board_init (void)
 	/* icache is already enabled, don't reenable it */
 	dcache_enable();
 	icache_enable();
+
+	return 0;
+}
+
+int board_late_init(void)
+{
+	bootmenu_simple_init(&h1940_bm_setup);
 
 	return 0;
 }
