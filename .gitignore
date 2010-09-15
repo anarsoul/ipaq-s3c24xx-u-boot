@@ -6,6 +6,7 @@
 # Normal rules
 #
 
+*.swp
 *.rej
 *.orig
 *.a
