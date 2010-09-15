@@ -32,6 +32,7 @@ COBJS-y += ACEX1K.o
 COBJS-y += altera.o
 COBJS-y += bedbug.o
 COBJS-y += bootmenu.o
+COBJS-y += bootmenu_simple.o
 COBJS-y += circbuf.o
 COBJS-y += cmd_autoscript.o
 COBJS-$(CONFIG_CMD_BDI) += cmd_bdinfo.o
