@@ -169,7 +169,8 @@
 #define PHYS_SDRAM_1_SIZE	0x02000000 /* 32 MB */
 
 #define CFG_NO_FLASH		1
-#define	CFG_ENV_IS_NOWHERE	0
+#define	CFG_ENV_IS_IN_NAND	1
+#define CFG_ENV_OFFSET		0x40000
 #define CFG_ENV_SIZE		0x4000		/* 16k Total Size of Environment Sector */
 
 #define NAND_MAX_CHIPS		1
@@ -207,7 +208,7 @@
 #define CONFIG_S3C2410_NAND_HWECC 1
 
 #define MTDIDS_DEFAULT		"nand0=Internal"
-#define MTPARTS_DEFAULT		"Internal:16k(Boot0),256k(Boot1),3M(Kernel),-(Filesystem)"
+#define MTPARTS_DEFAULT		"Internal:16k(Boot0),240k(Boot1),16k(Env),3M(Kernel),-(Filesystem)"
 #define CFG_NAND_DYNPART_MTD_KERNEL_NAME "Internal"
 #define CONFIG_NAND_DYNPART
 
