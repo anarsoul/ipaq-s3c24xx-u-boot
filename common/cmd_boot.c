@@ -107,6 +107,11 @@ int do_bootstrap(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	udc_disable();
 #endif
 
+#ifdef BOARD_DEINIT
+	extern void board_deinit(void);
+	board_deinit();
+#endif
+
 	disable_interrupts();
 	icache_disable();
 	dcache_disable();

@@ -197,6 +197,11 @@ int board_late_init(void)
 	return 0;
 }
 
+void board_deinit(void)
+{
+	h1940_led_set(-1);
+}
+
 #if defined(CONFIG_USB_DEVICE)
 void udc_ctrl(enum usbd_event event, int param)
 {

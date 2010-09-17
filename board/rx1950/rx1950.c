@@ -59,6 +59,8 @@ void rx1950_led_set(int value)
 {
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
 
+	value += 1;
+
 	if (value & 1)
 		gpio->GPADAT |= (1 << 6);
 	else
@@ -118,6 +120,7 @@ int board_init (void)
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
 
 	/* Configure some GPIO banks */
+	gpio->GPGCON = 0x02a288aa;
 	gpio->GPECON = 0xa56aa955;
 	gpio->GPJCON = 0x01555555;
 
@@ -146,6 +149,11 @@ int board_late_init(void)
 	bootmenu_simple_init(&rx1950_bm_setup);
 
 	return 0;
+}
+
+void board_deinit(void)
+{
+	rx1950_led_set(-1);
 }
 
 #if defined(CONFIG_USB_DEVICE)

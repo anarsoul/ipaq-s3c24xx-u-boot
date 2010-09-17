@@ -236,6 +236,7 @@
 #define CONFIG_NAND_DYNPART
 
 #define BOARD_LATE_INIT			1
+#define BOARD_DEINIT			1
 
 #if 0
 #define CONFIG_VIDEO
