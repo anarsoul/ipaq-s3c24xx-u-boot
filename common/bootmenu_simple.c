@@ -59,6 +59,13 @@ static int prev_key(void)
 	return debounce(setup->prev_key, &last_prev);
 }
 
+static int select_key(void)
+{
+	static int last_select = -1;
+
+	return debounce(setup->select_key, &last_select);
+}
+
 static void bootmenu_simple_hook(int activity)
 {
 	int old_bootindex = bootindex;
@@ -73,6 +80,8 @@ static void bootmenu_simple_hook(int activity)
 		bootindex++;
 	}
 
+	if (select_key())
+		run_command(getenv("bootcmd"), 0);
 
 	if (old_bootindex != bootindex) {
 		bootindex_str[0] = bootindex + '0';

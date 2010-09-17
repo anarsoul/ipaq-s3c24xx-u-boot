@@ -26,8 +26,11 @@ struct bootmenu_simple_setup {
 	/* non-zero while the "next" key is being pressed */
 	int (*next_key)(void);
 
-	/* non-zero while the "enter" key is being pressed */
+	/* non-zero while the "prev" key is being pressed */
 	int (*prev_key)(void);
+
+	/* non-zero while the "enter" key is being pressed */
+	int (*select_key)(void);
 
 	/* prints current index by any means (LEDs, LCD, etc) */
 	void (*print_index)(int index);

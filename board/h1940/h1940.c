@@ -97,8 +97,6 @@ void h1940_led_set(int value)
 {
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
 
-	value += 1;
-
 	if (value & 1) {
 		h1940_latch |= H1940_LATCH_LED_GREEN;
 		outl(h1940_latch, H1940_LATCH);
@@ -146,9 +144,19 @@ int h1940_down_pressed(void)
 	return 1;
 }
 
+int h1940_enter_pressed(void)
+{
+	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
+
+	if (gpio->GPFDAT & (1 << 7))
+		return 0;
+	return 1;
+}
+
 static struct bootmenu_simple_setup h1940_bm_setup = {
 	.next_key = h1940_down_pressed,
 	.prev_key = h1940_up_pressed,
+	.select_key = h1940_enter_pressed,
 	.print_index = h1940_led_set,
 };
 
