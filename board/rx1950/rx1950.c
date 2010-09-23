@@ -153,6 +153,10 @@ int board_late_init(void)
 
 void board_deinit(void)
 {
+	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
+
+	/* Enable write protect */
+	gpio->GPADAT &= ~(1 << 0);
 	rx1950_led_set(-1);
 }
 
