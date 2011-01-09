@@ -111,7 +111,7 @@
 #define CONFIG_CMD_EXT2
 
 #define CONFIG_BOOTDELAY	10
-#define CONFIG_BOOTARGS    	"rootfstype=ext2 root=/dev/mmcblk0p2 rootdelay=5"
+#define CONFIG_BOOTARGS    	"root=/dev/nfs rw nfsroot=192.168.1.200:/rootfs ip=192.168.1.202::192.168.1.200:255.255.255.0"
 #define CONFIG_ETHADDR		01:ab:cd:ef:fe:dc
 #define CONFIG_NETMASK          255.255.255.0
 #define CONFIG_IPADDR		10.0.0.110
@@ -180,8 +180,8 @@
 	"stderr=usbtty\0stdout=usbtty\0stdin=usbtty\0"\
 	"mtdparts=Internal:16k(Boot0),256k(Boot1),32k(Opts),3M(Kernel),-(Filesystem)\0"\
 	"bootcmd0=mmcinit; fatload mmc 1:1 0x30080000 h1940.bl; bootstrap 0x30080000\0"\
-	"bootcmd1=mmcinit; fatload mmc 1:1 0x31000000 uImage; bootm 0x31000000\0"\
-	"bootindex=0\0"\
+	"bootcmd1=mmcinit; fatload mmc 1:1 0x31000000 _linux/uImage; bootm 0x31000000\0"\
+	"bootindex=1\0"\
 	""
 
 /*-----------------------------------------------------------------------
@@ -192,8 +192,7 @@
 #define PHYS_SDRAM_1_SIZE	0x04000000 /* 32 MB */
 
 #define CFG_NO_FLASH		1
-#define	CFG_ENV_IS_IN_NAND	1
-#define CFG_ENV_OFFSET		0x40000
+#define CFG_ENV_IS_NOWHERE	1
 #define CFG_ENV_SIZE		0x4000		/* 16k Total Size of Environment Sector */
 
 #define NAND_MAX_CHIPS		1
